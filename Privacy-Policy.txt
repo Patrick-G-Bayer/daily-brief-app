@@ -1,0 +1,249 @@
+================================================================================
+                        PRIVACY POLICY
+                     Daily Intelligence Brief
+                     Effective Date: April 2026
+================================================================================
+
+1. INTRODUCTION
+
+This Privacy Policy ("Policy") describes how the Daily Intelligence Brief 
+("the Application," "the Service," or "we") collects, uses, processes, stores, 
+and protects personal data. The Application is a personal, single-user tool 
+designed to aggregate data from the user's own accounts and generate AI-powered 
+intelligence briefs for personal productivity purposes.
+
+By using the Application, you acknowledge that you are the sole user and the 
+sole data subject of all data processed by the Application. This Policy is 
+written in compliance with the General Data Protection Regulation (GDPR) and 
+applicable privacy laws.
+
+
+2. DATA CONTROLLER AND DATA SUBJECT
+
+The Application is designed as a personal tool for a single individual. 
+Accordingly, the user of the Application is simultaneously the data controller 
+and the data subject within the meaning of the GDPR. There is no separate 
+entity acting as a data controller. The Application does not process data 
+belonging to any third party.
+
+The user retains full control over all personal data at all times. The user 
+is responsible for providing, managing, and revoking API credentials used by 
+the Application.
+
+
+3. DATA SOURCES AND COLLECTION
+
+The Application accesses and collects data exclusively from the user's own 
+authorized accounts via official APIs. No data is collected from any other 
+individual or third party. The following data sources are accessed:
+
+  DATA SOURCE    | DATA TYPES                                      | PURPOSE                                      | ACCESS METHOD
+  ---------------|--------------------------------------------------|----------------------------------------------|-----------------------------------------------
+  Up Bank        | Transaction history, account balances,           | Financial context for daily and weekly        | Official Up Bank API via user-provided
+                 | spending categories, merchant details            | intelligence briefs                          | API token
+  ---------------|--------------------------------------------------|----------------------------------------------|-----------------------------------------------
+  Notion         | Tasks, goals, personal frameworks, project       | Task/goal tracking context; storage          | Official Notion API via user-provided
+                 | notes, database entries                         | destination for generated briefs             | integration token
+  ---------------|--------------------------------------------------|----------------------------------------------|-----------------------------------------------
+  Oura Ring      | Sleep metrics (duration, efficiency, stages),    | Health and wellness context for daily and    | Official Oura Cloud API v2 via user-
+                 | Readiness Score, Activity data (steps,          | weekly intelligence briefs                   | provided personal access token
+                 | calories, active time)                          |                                              |
+
+
+4. HOW DATA IS PROCESSED
+
+4.1 Local Processing
+
+All data collection, aggregation, and orchestration logic runs locally on 
+the user's personal machine. The Application executes as a set of scripts 
+that run on the user's local environment. No intermediate server, cloud 
+service, or third-party platform (other than those explicitly described 
+below) is involved in data processing.
+
+4.2 AI Processing via OpenAI API
+
+The Application transmits aggregated data from the sources described in 
+Section 3 to OpenAI's API (the "AI Service") for the purpose of generating 
+natural language summaries and intelligence briefs. This processing step is 
+necessary to transform raw data into coherent, actionable daily and weekly 
+briefs.
+
+The user explicitly acknowledges and consents to the transmission of their 
+personal data to OpenAI for this processing purpose. Data is sent to OpenAI 
+solely to generate the requested briefs and is not used for any other purpose.
+
+4.3 Output Storage
+
+Generated intelligence briefs (the output of AI processing) are saved 
+directly to the user's personal Notion workspace via the Notion API. The 
+briefs are stored as individual database entries in a dedicated Notion 
+database controlled by the user.
+
+
+5. THIRD-PARTY DATA DISCLOSURE
+
+The Application discloses user data to the following third parties solely 
+for the purposes described below:
+
+5.1 OpenAI (AI Processing)
+
+User data is transmitted to OpenAI's API to generate intelligence briefs. 
+OpenAI's data processing practices are governed by OpenAI's own privacy 
+policy, available at https://openai.com/policies/privacy-policy. The 
+following assurances apply:
+
+  - Data sent via the API is not used to train OpenAI models.
+  - OpenAI retains API input data for a limited period (typically 30 days) 
+    for abuse monitoring, after which it is deleted.
+  - The user may configure their OpenAI account to further restrict data 
+    retention.
+
+5.2 API Data Providers
+
+The Application accesses data from Up Bank, Notion, and Oura Ring using 
+the user's own authorized API credentials. These services receive API 
+requests from the user's machine and return the user's own data. The 
+Application does not share data with these services beyond what is necessary 
+to authenticate and retrieve the user's own information.
+
+5.3 No Other Disclosures
+
+The Application does not sell, rent, share, or otherwise disclose user data 
+to any other third party. There are no advertising networks, analytics 
+services, or data brokers involved. The Application contains no tracking 
+pixels, cookies, or similar technologies.
+
+
+6. OURA DATA: SPECIFIC PROVISIONS
+
+Given that this Application integrates with the Oura Ring platform, the 
+following specific provisions regarding Oura data apply:
+
+6.1 Access
+Oura data is accessed exclusively through the official Oura Cloud API v2 
+using a personal access token provided by and belonging to the user. The 
+Application does not use any unofficial or reverse-engineered methods to 
+access Oura data.
+
+6.2 Scope of Access
+The Application requests only the following Oura data scopes: personal daily 
+sleep data, daily readiness data, and daily activity data. No other Oura 
+data categories are accessed.
+
+6.3 Storage Limitation
+Oura data is fetched on-demand at the time of brief generation and is NOT 
+persistently stored in any database, file system, or cache beyond the 
+transient memory of the running script. The only durable form in which Oura 
+data exists after processing is within the generated brief text stored in 
+the user's personal Notion workspace.
+
+6.4 No Redistribution
+Oura data is never transferred, sold, published, or shared with any party 
+other than OpenAI (for brief generation) and the user's own Notion workspace 
+(for output storage). Oura data is not aggregated with data from other users 
+because the Application is a single-user tool.
+
+6.5 Deletion
+The user may request deletion of all Oura-derived data at any time by 
+deleting the relevant brief entries from their Notion workspace. Since Oura 
+data is not persistently stored by the Application, deletion from Notion 
+constitutes complete removal from the Application's data ecosystem.
+
+
+7. DATA RETENTION
+
+  DATA CATEGORY                              | RETENTION PERIOD                           | STORAGE LOCATION
+  -------------------------------------------|--------------------------------------------|---------------------------------------------
+  Up Bank transaction data                    | Fetched on-demand; not persistently stored | Transient script memory only
+  -------------------------------------------|--------------------------------------------|---------------------------------------------
+  Notion tasks, goals, frameworks            | Fetched on-demand; not copied or duplicated| User's Notion workspace (original)
+  -------------------------------------------|--------------------------------------------|---------------------------------------------
+  Oura sleep, readiness, activity data       | Fetched on-demand; not persistently stored | Transient script memory only
+  -------------------------------------------|--------------------------------------------|---------------------------------------------
+  Generated intelligence briefs               | Retained indefinitely until user deletes   | User's Notion workspace (Briefs database)
+  -------------------------------------------|--------------------------------------------|---------------------------------------------
+
+The Application does not maintain its own database or persistent storage. 
+All source data remains in its original location (Up Bank, Notion, Oura) and 
+is accessed via API at the time of brief generation. The only data created 
+by the Application is the generated brief text, which is stored in the 
+user's Notion workspace.
+
+
+8. GDPR COMPLIANCE
+
+As the user is both the data controller and the sole data subject, the 
+following GDPR rights are inherently satisfied:
+
+8.1 Right of Access (Article 15)
+The user has full access to all personal data at all times, as all data 
+resides in the user's own accounts (Up Bank, Notion, Oura) or is visible 
+in the generated briefs within the user's Notion workspace.
+
+8.2 Right to Rectification (Article 16)
+The user may correct any personal data by updating the source data in their 
+Up Bank, Notion, or Oura accounts directly.
+
+8.3 Right to Erasure / Right to Be Forgotten (Article 17)
+The user may delete all data processed by the Application by (a) deleting 
+the brief entries from their Notion workspace, and (b) revoking API tokens, 
+which will prevent any further data access. The Application does not maintain 
+any separate data store that would require additional deletion steps.
+
+8.4 Right to Restrict Processing (Article 18)
+The user may cease running the Application at any time, which immediately 
+stops all data processing.
+
+8.5 Right to Data Portability (Article 20)
+All data is stored in the user's own Notion workspace and can be exported 
+using Notion's built-in export functionality.
+
+8.6 Lawful Basis for Processing
+The lawful basis for processing is the legitimate interest of the data 
+subject (Article 6(1)(f) GDPR), as the user has explicitly chosen to use 
+this tool for personal productivity and well-being.
+
+
+9. DATA SECURITY
+
+The Application relies on the security measures implemented by the 
+respective API providers (Up Bank, Notion, Oura, OpenAI) for data in 
+transit. API tokens are stored locally on the user's machine and are not 
+transmitted to any party other than the intended API endpoint.
+
+The user is responsible for securing their local environment, including 
+protecting API tokens from unauthorized access, maintaining up-to-date 
+software, and using secure network connections when the Application 
+communicates with external APIs.
+
+
+10. CHILDREN'S PRIVACY
+
+The Application is not intended for use by individuals under the age of 16. 
+It is a personal productivity tool requiring API tokens from financial and 
+health services, which are available only to adults. The Application does 
+not knowingly collect data from children.
+
+
+11. CHANGES TO THIS POLICY
+
+The user may update this Privacy Policy at any time by modifying the source 
+document. As this is a personal tool with a single user, formal notification 
+procedures are not applicable. The user is encouraged to review this Policy 
+periodically to ensure it remains accurate and up-to-date.
+
+
+12. CONTACT INFORMATION
+
+For questions, concerns, or data deletion requests related to this Privacy 
+Policy or the Application's data practices, please contact:
+
+  Daily Intelligence Brief - Privacy Inquiry
+  Email: privacy@dailybrief.app
+  Response Time: Within 30 days
+
+--------------------------------------------------------------------------------
+This Privacy Policy was last updated in April 2026. This document applies to 
+the Daily Intelligence Brief personal application and describes the data 
+practices of a single-user, non-commercial tool.
+--------------------------------------------------------------------------------
