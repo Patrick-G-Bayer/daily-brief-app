@@ -42,7 +42,7 @@ function Robot() {
   return (
     <g>
       <line x1="100" y1="16" x2="100" y2="40" {...s} />
-      <circle className="robot-bulb" cx="100" cy="14" r="10" fill="#ff5d73" {...s} />
+      <circle cx="100" cy="14" r="10" fill="#ff5d73" {...s} />
       <rect x="38" y="60" width="18" height="32" rx="7" fill={Y} {...s} />
       <rect x="144" y="60" width="18" height="32" rx="7" fill={Y} {...s} />
       <path d="M54 142 L30 172" stroke={INK} strokeWidth={16} strokeLinecap="round" />
@@ -64,11 +64,11 @@ function Robot() {
       <path d="M78 170 L122 170" {...s} strokeWidth={4} />
       <rect x="50" y="34" width="100" height="80" rx="22" fill={B} {...s} />
       <rect x="62" y="46" width="76" height="56" rx="14" fill="#eaf7ff" {...s} strokeWidth={4} />
-      <g className="eye">
+      <g>
         <circle cx="84" cy="70" r="10" fill={INK} />
         <circle cx="87" cy="66" r="3.5" fill="#fff" />
       </g>
-      <g className="eye">
+      <g>
         <circle cx="116" cy="70" r="10" fill={INK} />
         <circle cx="119" cy="66" r="3.5" fill="#fff" />
       </g>
@@ -138,7 +138,7 @@ function Monster() {
       <circle cx="107" cy="92" r="17" fill="#3fc1a5" />
       <circle cx="108" cy="93" r="9" fill={INK} />
       <circle cx="114" cy="85" r="5" fill="#fff" />
-      <g className="eye">
+      <g>
         <path d="M74 60 Q105 50 136 60" fill="none" {...s} />
       </g>
       <path d="M62 134 Q105 192 148 134 Q105 150 62 134 Z" fill="#5a1f4a" {...s} />
@@ -221,12 +221,12 @@ function Alien() {
 }
 
 export const CHARACTERS: ArtDef[] = [
-  { id: 'dino', label: 'Dinosaur', w: 220, h: 230, size: 0.33, shadow: true, anim: 'jump', sound: 'roar', art: Dino },
-  { id: 'robot', label: 'Robot', w: 200, h: 230, size: 0.33, shadow: true, anim: 'spin', sound: 'beepBoop', art: Robot },
-  { id: 'unicorn', label: 'Unicorn', w: 216, h: 230, size: 0.33, shadow: true, anim: 'twirl', sound: 'magic', art: Unicorn },
-  { id: 'monster', label: 'Fuzzy monster', w: 210, h: 230, size: 0.33, shadow: true, anim: 'jelly', sound: 'blub', art: Monster },
-  { id: 'cat', label: 'Cat', w: 210, h: 230, size: 0.31, shadow: true, anim: 'bounce', sound: 'meow', art: Cat },
-  { id: 'alien', label: 'Alien', w: 210, h: 230, size: 0.33, shadow: true, anim: 'float', sound: 'theremin', art: Alien },
+  { id: 'dino', label: 'Dinosaur', w: 220, h: 230, size: 0.33, art: Dino },
+  { id: 'robot', label: 'Robot', w: 200, h: 230, size: 0.33, art: Robot },
+  { id: 'unicorn', label: 'Unicorn', w: 216, h: 230, size: 0.33, art: Unicorn },
+  { id: 'monster', label: 'Fuzzy monster', w: 210, h: 230, size: 0.33, art: Monster },
+  { id: 'cat', label: 'Cat', w: 210, h: 230, size: 0.31, art: Cat },
+  { id: 'alien', label: 'Alien', w: 210, h: 230, size: 0.33, art: Alien },
 ];
 
 export const CHARACTER_MAP: Record<string, ArtDef> = Object.fromEntries(CHARACTERS.map((c) => [c.id, c]));

@@ -12,7 +12,7 @@ export const line = {
 
 export function Eye({ x, y, r = 13 }: { x: number; y: number; r?: number }) {
   return (
-    <g className="eye">
+    <g>
       <circle cx={x} cy={y} r={r} fill="#fff" stroke={INK} strokeWidth={4} />
       <circle cx={x + r * 0.1} cy={y + r * 0.15} r={r * 0.56} fill={INK} />
       <circle cx={x + r * 0.3} cy={y - r * 0.12} r={r * 0.22} fill="#fff" />

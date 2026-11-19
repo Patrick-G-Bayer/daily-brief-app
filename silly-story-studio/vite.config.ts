@@ -15,7 +15,7 @@ export default defineConfig({
       manifest: {
         name: 'Silly Story Studio',
         short_name: 'Silly Story',
-        description: 'Make silly stories together: drag characters, add props, record voices.',
+        description: 'Make puppet shows together: pick actors and backdrops, move them around, and record your voices.',
         start_url: './',
         scope: './',
         display: 'fullscreen',

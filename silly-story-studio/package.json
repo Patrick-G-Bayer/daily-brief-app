@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "A touch-first story playground for grown-ups and preschoolers.",
+  "description": "A touch-first puppet show maker for grown-ups and preschoolers.",
   "scripts": {
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",

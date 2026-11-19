@@ -1,5 +1,5 @@
-import { useId, type ReactElement } from 'react';
-import type { SceneId } from '../types';
+import { useId } from 'react';
+import type { SceneDef } from '../types';
 import { Blob, INK, starPath } from './common';
 
 /** A gradient id that's unique per rendered copy (the scene is also drawn as a button thumbnail). */
@@ -13,7 +13,7 @@ function Sun({ x, y }: { x: number; y: number }) {
   const rays = Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2);
   return (
     <g>
-      <g className="scene-sun">
+      <g>
         {rays.map((a, i) => (
           <line
             key={i}
@@ -39,7 +39,7 @@ function Sun({ x, y }: { x: number; y: number }) {
 
 function SkyCloud({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`} className="scene-cloud">
+    <g transform={`translate(${x} ${y}) scale(${s})`}>
       <Blob
         fill="#ffffff"
         outline={0}
@@ -180,7 +180,7 @@ function Jungle() {
       {/* waterfall */}
       <path d="M760 330 L900 330 L930 600 L740 600 Z" fill="#8a8fa8" {...o} />
       <path d="M790 330 L870 330 L890 610 L780 610 Z" fill="#7fd3ff" />
-      <path d="M810 350 L815 590 M840 350 L845 600 M865 350 L870 590" stroke="#e8f8ff" strokeWidth={8} strokeLinecap="round" className="scene-water" />
+      <path d="M810 350 L815 590 M840 350 L845 600 M865 350 L870 590" stroke="#e8f8ff" strokeWidth={8} strokeLinecap="round" />
       <path d="M0 600 Q300 560 700 600 T1600 590 V900 H0 Z" fill="#6cc24a" />
       <ellipse cx="830" cy="650" rx="230" ry="60" fill="#5ec8f0" {...o} />
       <ellipse cx="790" cy="640" rx="90" ry="16" fill="#bfeaff" opacity="0.8" />
@@ -224,7 +224,6 @@ function Tower({ x, w, top, roof }: { x: number; w: number; top: number; roof: s
       <path d={`M${x - 20} ${top} L${x + w / 2} ${top - w * 1.1} L${x + w + 20} ${top} Z`} fill={roof} {...o} />
       <line x1={x + w / 2} y1={top - w * 1.1} x2={x + w / 2} y2={top - w * 1.1 - 70} {...o} />
       <path
-        className="scene-flag"
         d={`M${x + w / 2} ${top - w * 1.1 - 70} L${x + w / 2 + 60} ${top - w * 1.1 - 52} L${x + w / 2} ${top - w * 1.1 - 34} Z`}
         fill="#ffd43b"
         {...o}
@@ -254,7 +253,7 @@ function Castle() {
         [1460, 170],
         [980, 60],
       ].map(([x, y], i) => (
-        <path key={i} d={starPath(x, y, 18, 8)} fill="#fff6a8" className="scene-twinkle" style={{ animationDelay: `${i * 0.7}s` }} />
+        <path key={i} d={starPath(x, y, 18, 8)} fill="#fff6a8" />
       ))}
       <SkyCloud x={120} y={260} s={0.8} />
       <SkyCloud x={1320} y={300} s={0.7} />
@@ -312,21 +311,9 @@ function Castle() {
   );
 }
 
-export interface SceneDef {
-  id: SceneId;
-  label: string;
-  /** Base pitch (Hz) used to colour the scene-change jingle. */
-  tone: number;
-  art: () => ReactElement;
-}
-
 export const SCENES: SceneDef[] = [
-  { id: 'farm', label: 'Farm', tone: 523.25, art: Farm },
-  { id: 'jungle', label: 'Jungle', tone: 440, art: Jungle },
-  { id: 'castle', label: 'Castle', tone: 587.33, art: Castle },
+  { id: 'farm', label: 'Farm', art: Farm },
+  { id: 'jungle', label: 'Jungle', art: Jungle },
+  { id: 'castle', label: 'Castle', art: Castle },
 ];
 
-export const SCENE_MAP: Record<SceneId, SceneDef> = Object.fromEntries(SCENES.map((s) => [s.id, s])) as Record<
-  SceneId,
-  SceneDef
->;

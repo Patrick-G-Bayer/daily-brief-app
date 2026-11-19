@@ -138,7 +138,7 @@ function Cake() {
       <path d="M12 72 Q20 84 28 72 Q36 84 44 72 Q52 84 60 72 Q68 84 76 72 Q84 84 92 72 Q98 80 98 70 L98 66 L12 66 Z" fill="#fff" />
       <rect x="26" y="36" width="58" height="30" rx="8" fill="#fff1a8" {...s} />
       <rect x="51" y="14" width="8" height="24" rx="2" fill="#7fd3ff" {...s4} strokeWidth={3} />
-      <path className="flame" d="M55 2 Q64 12 55 16 Q46 12 55 2 Z" fill="#ffb347" {...s4} strokeWidth={2.5} />
+      <path d="M55 2 Q64 12 55 16 Q46 12 55 2 Z" fill="#ffb347" {...s4} strokeWidth={2.5} />
       <circle cx="30" cy="92" r="3" fill="#ffd43b" />
       <circle cx="52" cy="96" r="3" fill="#4fa8ff" />
       <circle cx="76" cy="90" r="3" fill="#6fd36b" />
@@ -222,7 +222,7 @@ function Rainbow() {
 function Rocket() {
   return (
     <g>
-      <path className="flame" d="M28 102 Q45 152 62 102 Z" fill="#ff9f1c" {...s4} />
+      <path d="M28 102 Q45 152 62 102 Z" fill="#ff9f1c" {...s4} />
       <path d="M36 104 Q45 132 54 104 Z" fill="#ffe066" />
       <path d="M20 74 L4 114 L24 104 Z" fill="#ff4d6d" {...s} />
       <path d="M70 74 L86 114 L66 104 Z" fill="#ff4d6d" {...s} />
@@ -328,26 +328,26 @@ function Banana() {
 }
 
 export const PROPS: ArtDef[] = [
-  { id: 'ball', label: 'Beach ball', w: 100, h: 100, size: 0.15, shadow: true, anim: 'bounce', sound: 'boing', art: BeachBall },
-  { id: 'balloon', label: 'Balloon', w: 80, h: 130, size: 0.22, shadow: false, anim: 'popback', sound: 'pop', art: Balloon },
-  { id: 'star', label: 'Star', w: 100, h: 100, size: 0.15, shadow: false, anim: 'spin', sound: 'sparkle', art: Star },
-  { id: 'flower', label: 'Flower', w: 80, h: 120, size: 0.18, shadow: true, anim: 'wiggle', sound: 'giggle', art: Flower },
-  { id: 'tree', label: 'Tree', w: 120, h: 150, size: 0.34, shadow: true, anim: 'shake', sound: 'rustle', art: Tree },
-  { id: 'car', label: 'Toy car', w: 140, h: 90, size: 0.15, shadow: true, anim: 'drive', sound: 'honk', art: Car },
-  { id: 'crown', label: 'Crown', w: 120, h: 90, size: 0.13, shadow: true, anim: 'pulse', sound: 'tada', art: Crown },
-  { id: 'cake', label: 'Cake', w: 110, h: 120, size: 0.18, shadow: true, anim: 'jump', sound: 'partyHorn', art: Cake },
-  { id: 'umbrella', label: 'Umbrella', w: 120, h: 130, size: 0.21, shadow: true, anim: 'spin', sound: 'fwump', art: Umbrella },
-  { id: 'duck', label: 'Rubber duck', w: 120, h: 100, size: 0.14, shadow: true, anim: 'jelly', sound: 'squeak', art: Duck },
-  { id: 'apple', label: 'Apple', w: 90, h: 100, size: 0.13, shadow: true, anim: 'jump', sound: 'crunch', art: Apple },
-  { id: 'drum', label: 'Drum', w: 110, h: 110, size: 0.16, shadow: true, anim: 'jelly', sound: 'drum', art: Drum },
-  { id: 'rainbow', label: 'Rainbow', w: 160, h: 100, size: 0.2, shadow: false, anim: 'pulse', sound: 'harp', art: Rainbow },
-  { id: 'rocket', label: 'Rocket', w: 90, h: 150, size: 0.25, shadow: true, anim: 'blast', sound: 'rocket', art: Rocket },
-  { id: 'hat', label: 'Wizard hat', w: 110, h: 120, size: 0.17, shadow: true, anim: 'twirl', sound: 'magic', art: WizardHat },
-  { id: 'gift', label: 'Present', w: 100, h: 100, size: 0.15, shadow: true, anim: 'jump', sound: 'tada', art: Gift },
-  { id: 'icecream', label: 'Ice cream', w: 80, h: 130, size: 0.2, shadow: true, anim: 'wiggle', sound: 'slurp', art: IceCream },
-  { id: 'cloud', label: 'Cloud', w: 140, h: 90, size: 0.15, shadow: false, anim: 'float', sound: 'puff', art: Cloud },
-  { id: 'wand', label: 'Magic wand', w: 100, h: 120, size: 0.18, shadow: true, anim: 'twirl', sound: 'sparkle', art: Wand },
-  { id: 'banana', label: 'Banana', w: 120, h: 90, size: 0.13, shadow: true, anim: 'flip', sound: 'slideDown', art: Banana },
+  { id: 'ball', label: 'Beach ball', w: 100, h: 100, size: 0.15, art: BeachBall },
+  { id: 'balloon', label: 'Balloon', w: 80, h: 130, size: 0.22, art: Balloon },
+  { id: 'star', label: 'Star', w: 100, h: 100, size: 0.15, art: Star },
+  { id: 'flower', label: 'Flower', w: 80, h: 120, size: 0.18, art: Flower },
+  { id: 'tree', label: 'Tree', w: 120, h: 150, size: 0.34, art: Tree },
+  { id: 'car', label: 'Toy car', w: 140, h: 90, size: 0.15, art: Car },
+  { id: 'crown', label: 'Crown', w: 120, h: 90, size: 0.13, art: Crown },
+  { id: 'cake', label: 'Cake', w: 110, h: 120, size: 0.18, art: Cake },
+  { id: 'umbrella', label: 'Umbrella', w: 120, h: 130, size: 0.21, art: Umbrella },
+  { id: 'duck', label: 'Rubber duck', w: 120, h: 100, size: 0.14, art: Duck },
+  { id: 'apple', label: 'Apple', w: 90, h: 100, size: 0.13, art: Apple },
+  { id: 'drum', label: 'Drum', w: 110, h: 110, size: 0.16, art: Drum },
+  { id: 'rainbow', label: 'Rainbow', w: 160, h: 100, size: 0.2, art: Rainbow },
+  { id: 'rocket', label: 'Rocket', w: 90, h: 150, size: 0.25, art: Rocket },
+  { id: 'hat', label: 'Wizard hat', w: 110, h: 120, size: 0.17, art: WizardHat },
+  { id: 'gift', label: 'Present', w: 100, h: 100, size: 0.15, art: Gift },
+  { id: 'icecream', label: 'Ice cream', w: 80, h: 130, size: 0.2, art: IceCream },
+  { id: 'cloud', label: 'Cloud', w: 140, h: 90, size: 0.15, art: Cloud },
+  { id: 'wand', label: 'Magic wand', w: 100, h: 120, size: 0.18, art: Wand },
+  { id: 'banana', label: 'Banana', w: 120, h: 90, size: 0.13, art: Banana },
 ];
 
 export const PROP_MAP: Record<string, ArtDef> = Object.fromEntries(PROPS.map((p) => [p.id, p]));

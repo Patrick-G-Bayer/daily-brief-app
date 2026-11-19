@@ -5,9 +5,9 @@ export type MicCardKind = 'ask' | 'denied' | 'nomic' | 'error' | 'insecure' | 'u
 
 const COPY: Record<MicCardKind, { title: string; body: string[]; retry: boolean }> = {
   ask: {
-    title: 'Let the characters talk?',
+    title: 'Record your voices too?',
     body: [
-      'Silly Story Studio can record short voice clips so the characters say whatever you like.',
+      'Shows record the puppets’ moves together with your voices, like a little movie.',
       'Recordings are saved only on this device. They are never uploaded or shared.',
       'Press and hold the green button, then choose “Allow” when the browser asks.',
     ],
@@ -24,7 +24,7 @@ const COPY: Record<MicCardKind, { title: string; body: string[]; retry: boolean 
   },
   nomic: {
     title: 'No microphone found',
-    body: ['This device doesn’t seem to have a microphone available right now.', 'Plug one in or close other apps that may be using it, then try again.'],
+    body: ['This device doesn’t seem to have a microphone available right now.', 'Close other apps that may be using it, then try again.'],
     retry: true,
   },
   error: {
@@ -33,7 +33,7 @@ const COPY: Record<MicCardKind, { title: string; body: string[]; retry: boolean 
     retry: true,
   },
   insecure: {
-    title: 'Recording needs a secure page',
+    title: 'Voices need a secure page',
     body: [
       'Browsers only allow the microphone on pages opened with https:// (or on localhost).',
       'Serve the game over HTTPS. It’s also needed for offline play.',
@@ -41,14 +41,27 @@ const COPY: Record<MicCardKind, { title: string; body: string[]; retry: boolean 
     retry: false,
   },
   unsupported: {
-    title: 'This browser can’t record',
-    body: ['Voice recording isn’t available in this browser.', 'Try the latest Chrome on your tablet. Everything else still works.'],
+    title: 'This browser can’t record voices',
+    body: ['Voice recording isn’t available in this browser. Try the latest Chrome on your tablet.'],
     retry: false,
   },
 };
 
-/** Grown-up facing explanation card for microphone permission and problems. */
-export function MicCard({ kind, onClose, onConfirm }: { kind: MicCardKind; onClose: () => void; onConfirm: () => void }) {
+/**
+ * Grown-up facing card shown before recording when the microphone isn't ready.
+ * Hold ✓ to use the mic; ✕ records the show without sound.
+ */
+export function MicCard({
+  kind,
+  onConfirm,
+  onSilent,
+  onClose,
+}: {
+  kind: MicCardKind;
+  onConfirm: () => void;
+  onSilent: () => void;
+  onClose: () => void;
+}) {
   const c = COPY[kind];
   return (
     <div className="overlay" onPointerDown={(e) => e.target === e.currentTarget && onClose()}>
@@ -61,16 +74,18 @@ export function MicCard({ kind, onClose, onConfirm }: { kind: MicCardKind; onClo
           <p key={i}>{p}</p>
         ))}
         <div className="card-actions">
-          <button type="button" className="round-btn close-btn" aria-label="Close" onClick={onClose}>
+          <button type="button" className="round-btn close-btn" aria-label="Record without sound" onClick={onSilent}>
             <CloseIcon />
           </button>
           {c.retry && (
-            <HoldButton ms={1200} label={kind === 'ask' ? 'Allow microphone' : 'Try again'} className="round-btn ok-btn" onDone={onConfirm}>
+            <HoldButton ms={1200} label={kind === 'ask' ? 'Use the microphone' : 'Try again'} className="round-btn ok-btn" onDone={onConfirm}>
               <CheckIcon />
             </HoldButton>
           )}
         </div>
-        <p className="card-hint">{c.retry ? 'Grown-ups: press and hold ✓' : 'Grown-ups only'}</p>
+        <p className="card-hint">
+          {c.retry ? 'Grown-ups: press and hold ✓ to use the microphone. ✕ records without sound.' : '✕ records the show without sound.'}
+        </p>
       </div>
     </div>
   );
