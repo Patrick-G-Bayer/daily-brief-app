@@ -128,7 +128,7 @@ button { font: inherit; color: inherit; }
 .wordmark .sp span:nth-child(6) { color: #F27DB4; }
 
 .gate { position: relative; flex: none; }
-.gate .sticker { width: 76px; height: 76px; }
+.gate .sticker { width: 76px; height: 76px; touch-action: none; }
 .gate .sticker svg { width: 38px; height: 38px; }
 .ring { position: absolute; inset: -9px; width: calc(100% + 18px); height: calc(100% + 18px); pointer-events: none; transform: rotate(-90deg); }
 .ring circle { fill: none; stroke: var(--box); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
@@ -223,7 +223,11 @@ button { font: inherit; color: inherit; }
 .sheet p { margin: 0; color: var(--muted); font-size: 16px; max-width: 60ch; }
 .sheet .row { display: flex; flex-wrap: wrap; gap: 10px; }
 .sheet .row .btn { flex: 1 1 160px; }
-.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; opacity: 0; }
+.sheet .fine { font-size: 14px; }
+.file-btn { position: relative; overflow: hidden; }
+.file-btn input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 200px; }
+.file-btn:focus-within { outline: 4px solid var(--ink); outline-offset: 3px; }
+.sheet.dropping { outline: 5px dashed var(--box); outline-offset: 6px; }
 
 .loading { color: var(--paper); text-align: center; font: 700 22px/1.3 var(--font-display); }
 .dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
@@ -477,8 +481,13 @@ button { font: inherit; color: inherit; }
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="parentTitle">
     <h2 id="parentTitle">Grown-ups</h2>
     <p>Photograph a colouring page, or any picture. Blank outline pages give the cleanest result; coloured pictures are turned into outlines for you.</p>
-    <button id="photoBtn" class="btn primary" type="button">Take or choose a photo</button>
-    <input id="photoInput" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true">
+    <!-- Each button is a real file field under the finger: tablets and in-app browsers often
+         ignore a file picker opened by script, but never one the person taps directly. -->
+    <div class="row">
+      <label class="btn primary file-btn" for="cameraInput">Take a photo<input id="cameraInput" type="file" accept="image/*" capture="environment"></label>
+      <label class="btn primary file-btn" for="photoInput">Choose a picture<input id="photoInput" type="file" accept="image/*"></label>
+    </div>
+    <p class="fine">On a computer you can also paste a picture or drop one onto this box.</p>
     <div class="row">
       <button id="tidyBtn" class="btn" type="button">Remove pictures</button>
       <button id="soundBtn" class="btn" type="button" aria-pressed="true">Sound: on</button>
@@ -1334,13 +1343,14 @@ async function openItem(it) {
     const held = performance.now() - t0; t0 = 0; cancelAnimationFrame(raf); set(0);
     if (held < HOLD) { $('gateHint').hidden = false; clearTimeout(hintTimer); hintTimer = setTimeout(() => { $('gateHint').hidden = true; }, 2600); }
   }
-  btn.addEventListener('pointerdown', start);
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => btn.addEventListener(ev, stop));
+  // Capture the finger so a small wobble off the button doesn't cancel the hold.
+  btn.addEventListener('pointerdown', (e) => { try { btn.setPointerCapture(e.pointerId); } catch (err) {} start(e); });
+  ['pointerup', 'pointercancel'].forEach((ev) => btn.addEventListener(ev, stop));
   btn.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) start(e); });
   btn.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') stop(); });
   btn.addEventListener('contextmenu', (e) => e.preventDefault());
 })();
-function openParent() { syncSoundBtn(); $('parent').hidden = false; $('photoBtn').focus(); }
+function openParent() { syncSoundBtn(); $('parent').hidden = false; $('cameraInput').focus(); }
 function closeParent() { $('parent').hidden = true; }
 function syncSoundBtn() { const b = $('soundBtn'); b.textContent = Sound.on ? 'Sound: on' : 'Sound: off'; b.setAttribute('aria-pressed', String(Sound.on)); }
 $('parentClose').addEventListener('click', closeParent);
@@ -1348,8 +1358,26 @@ $('parent').addEventListener('click', (e) => { if (e.target === $('parent')) clo
 $('soundBtn').addEventListener('click', () => { Sound.set(!Sound.on); syncSoundBtn(); });
 $('tidyBtn').addEventListener('click', () => { closeParent(); tidy = true; $('tidyBar').hidden = false; renderHome(); });
 $('tidyDone').addEventListener('click', () => { tidy = false; $('tidyBar').hidden = true; renderHome(); });
-$('photoBtn').addEventListener('click', () => $('photoInput').click());
-$('photoInput').addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) onPhoto(f); });
+for (const id of ['cameraInput', 'photoInput']) {
+  $(id).addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) onPhoto(f); });
+}
+// Paste or drop a picture while the grown-ups box is open.
+const firstImage = (list) => [...(list || [])].find((f) => f && f.type.startsWith('image/'));
+document.addEventListener('paste', (e) => {
+  if ($('parent').hidden) return;
+  const f = firstImage(e.clipboardData && e.clipboardData.files);
+  if (f) { e.preventDefault(); onPhoto(f); }
+});
+(() => {
+  const sheet = document.querySelector('#parent .sheet');
+  sheet.addEventListener('dragover', (e) => { e.preventDefault(); sheet.classList.add('dropping'); });
+  sheet.addEventListener('dragleave', () => sheet.classList.remove('dropping'));
+  sheet.addEventListener('drop', (e) => {
+    e.preventDefault(); sheet.classList.remove('dropping');
+    const f = firstImage(e.dataTransfer && e.dataTransfer.files);
+    if (f) onPhoto(f); else toast('Drop a photo or picture file.');
+  });
+})();
 
 // ================================================================ grown-ups: photo set-up
 const P = { src: null, sw: 0, sh: 0, corners: null, scale: 1, drag: -1, warped: null, feat: null, result: null, step: 1, timer: 0 };
