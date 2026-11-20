@@ -272,17 +272,52 @@ button { font: inherit; color: inherit; }
 /* ---------- play ---------- */
 .play-top { display: flex; align-items: center; gap: 14px; padding-block: 14px 6px; }
 .play-top .spacer { flex: 1; }
-.stage { flex: 1; min-height: 0; display: grid; place-items: center; padding-block: 8px 14px; }
+/* The stage is the zoom window: the sheet sits at a fitted size and is scaled / moved with a transform. */
+.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; }
 .paper {
-  position: relative;
+  position: absolute; left: 0; top: 0;
   box-sizing: content-box;
   border: 3px solid var(--ink);
   border-radius: 4px;
   background: var(--paper);
   box-shadow: 0 8px 0 rgba(0, 0, 0, .28);
-  touch-action: none;
+  transform-origin: 0 0;
   cursor: crosshair;
 }
+.paper.glide { transition: transform .22s ease-out; }
+.zoom {
+  position: absolute; z-index: 3;
+  right: max(16px, env(safe-area-inset-right, 0px)); bottom: 14px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.sticker.mini { width: 52px; height: 52px; box-shadow: 0 4px 0 var(--ink); }
+.sticker.mini svg { width: 26px; height: 26px; }
+
+/* Big crayon box (grown-ups' option) */
+.overlay.bottom { place-items: end center; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+.sheet.palette { width: min(780px, 100%); gap: 14px; }
+.pal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pal-label { margin: 4px 0 -4px; font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.pal-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 7px; }
+.sw {
+  width: 100%; min-width: 0; aspect-ratio: 1;
+  padding: 0;
+  border: 2.5px solid var(--ink); border-radius: 50%;
+  background: var(--c);
+  cursor: pointer;
+  transition: transform .12s;
+}
+.sw:active { transform: scale(.88); }
+.sw[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--paper), 0 0 0 6px var(--ink); }
+.pal-mix { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.mix-dot { width: 28px; height: 28px; flex: none; border: 2.5px solid var(--ink); border-radius: 50%; background: conic-gradient(#E5412F, #FFD43B, #8CCB3F, #5DC4EE, #2F6BD8, #8C58D6, #F27DB4, #E5412F); }
+.pal-recent { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pal-recent .sw { width: 42px; }
+.crayon.boxbtn { transform: translateY(24px); }
+.crayon.boxbtn:active { transform: translateY(14px); }
+.bb-box { fill: var(--box); stroke: var(--ink); stroke-width: 3; }
+.bb-plus { fill: none; stroke: var(--ink); stroke-width: 4.5; stroke-linecap: round; }
+.bb-tip { stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
 .paper canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .paper #lineCanvas { pointer-events: none; }
 .fx { position: absolute; inset: 0; pointer-events: none; }
@@ -297,7 +332,7 @@ button { font: inherit; color: inherit; }
   to { transform: translate(var(--dx), var(--dy)) scale(.1); opacity: .2; }
 }
 .paper.nope { animation: nope .3s; }
-@keyframes nope { 25% { transform: rotate(-.6deg); } 75% { transform: rotate(.6deg); } }
+@keyframes nope { 25% { rotate: -.6deg; } 75% { rotate: .6deg; } }
 
 .tray-wrap { position: relative; flex: none; height: 142px; }
 .tray {
@@ -384,7 +419,9 @@ button { font: inherit; color: inherit; }
   .tray-wrap { height: 104px; }
   .crayon { width: 42px; height: 96px; transform: translateY(40px); }
   .crayon[aria-checked="true"] { transform: translateY(4px); }
+  .crayon.boxbtn { transform: translateY(20px); }
   .lip { height: 44px; font-size: 12px; }
+  .sticker.mini { width: 44px; height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -464,16 +501,24 @@ button { font: inherit; color: inherit; }
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>
     </button>
   </div>
-  <div id="stage" class="stage gutter">
+  <div id="stage" class="stage">
     <div id="paper" class="paper">
       <canvas id="fillCanvas"></canvas>
       <canvas id="lineCanvas"></canvas>
       <div id="fx" class="fx"></div>
     </div>
+    <div class="zoom">
+      <button id="zoomIn" class="sticker mini" type="button" aria-label="Zoom in">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5M10.5 7.5v6M7.5 10.5h6"/></svg>
+      </button>
+      <button id="zoomOut" class="sticker mini" type="button" aria-label="Zoom out">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5M7.5 10.5h6"/></svg>
+      </button>
+    </div>
   </div>
   <div class="tray-wrap">
     <div class="tray"><div id="tray" class="tray-inner" role="radiogroup" aria-label="Crayons"></div></div>
-    <div class="lip" aria-hidden="true">12 colours · 1 rainbow</div>
+    <div id="lip" class="lip" aria-hidden="true">12 colours · 1 rainbow</div>
   </div>
 </section>
 
@@ -489,10 +534,33 @@ button { font: inherit; color: inherit; }
     </div>
     <p class="fine">On a computer you can also paste a picture or drop one onto this box.</p>
     <div class="row">
+      <button id="bigBoxBtn" class="btn" type="button" aria-pressed="false">Big crayon box: off</button>
+    </div>
+    <p class="fine">The big crayon box adds about 80 shades and a mix-your-own colour to the crayon tray, for grown-ups who want to join in.</p>
+    <div class="row">
       <button id="tidyBtn" class="btn" type="button">Remove pictures</button>
       <button id="soundBtn" class="btn" type="button" aria-pressed="true">Sound: on</button>
     </div>
     <button id="parentClose" class="btn ghost" type="button" style="color:var(--ink);border-color:var(--ink)">Close</button>
+  </div>
+</div>
+
+<div id="palette" class="overlay bottom" hidden>
+  <div class="sheet palette" role="dialog" aria-modal="true" aria-labelledby="paletteTitle">
+    <div class="pal-head">
+      <h2 id="paletteTitle">Big crayon box</h2>
+      <button id="paletteClose" class="sticker mini" type="button" aria-label="Close the big crayon box">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <p class="pal-label">Shades</p>
+    <div id="palShades" class="pal-grid" role="group" aria-label="Shades"></div>
+    <p class="pal-label">Earth, skin, greys and shine</p>
+    <div id="palEarth" class="pal-grid" role="group" aria-label="Earth, skin, greys and shine"></div>
+    <div class="pal-mix">
+      <label class="btn file-btn" for="mixInput"><span id="mixDot" class="mix-dot"></span>Mix your own<input id="mixInput" type="color" value="#7fb2e5"></label>
+      <div id="palRecentWrap" class="pal-recent"><span class="pal-label" style="margin:0">Recent</span><span id="palRecent" class="pal-recent"></span></div>
+    </div>
   </div>
 </div>
 
@@ -518,9 +586,19 @@ const CRAYONS = [
   { name: 'Blue', hex: '#2F6BD8' }, { name: 'Navy', hex: '#2B3A78' }, { name: 'Purple', hex: '#8C58D6' },
   { name: 'Pink', hex: '#F27DB4' }, { name: 'Brown', hex: '#9A5A30' }, { name: 'Peach', hex: '#F7C59F' },
 ];
-const RAINBOW = 12, ERASER = -1;
-const PAL = new Uint8Array(CRAYONS.length * 3);
-CRAYONS.forEach((c, i) => { const v = parseInt(c.hex.slice(1), 16); PAL[i * 3] = v >> 16; PAL[i * 3 + 1] = (v >> 8) & 255; PAL[i * 3 + 2] = v & 255; });
+// An area's colour is -1 (bare paper), -2 (rainbow) or a 0xRRGGBB number, so any colour fits.
+const NONE = -1, RAINBOW = -2, ERASER = NONE;
+const hexToInt = (hex) => parseInt(hex.slice(1), 16);
+const intToHex = (c) => '#' + c.toString(16).padStart(6, '0');
+const BASIC = CRAYONS.map((c) => hexToInt(c.hex));
+// A note per colour, from its hue, so every crayon still "sings".
+function noteFor(c) {
+  if (c < 0) return 7;
+  const r = (c >> 16 & 255) / 255, g = (c >> 8 & 255) / 255, b = (c & 255) / 255, mx = Math.max(r, g, b), d = mx - Math.min(r, g, b);
+  let h = 0;
+  if (d) { h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h = (h * 60 + 360) % 360; }
+  return Math.round(h / 30) % 12;
+}
 function hsl(h, s, l) {
   const a = s * Math.min(l, 1 - l);
   const f = (n) => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
@@ -528,6 +606,27 @@ function hsl(h, s, l) {
 }
 const RB = new Uint8Array(360 * 3);
 for (let h = 0; h < 360; h++) { const c = hsl(h, .82, .58); RB[h * 3] = c[0]; RB[h * 3 + 1] = c[1]; RB[h * 3 + 2] = c[2]; }
+
+// Big crayon box: 12 hues x 5 shades, then earth tones, skin tones, greys and metallics.
+const HUES = [[0, 'red'], [22, 'tangerine'], [38, 'orange'], [52, 'yellow'], [80, 'lime'], [125, 'green'], [165, 'teal'], [192, 'turquoise'], [215, 'sky blue'], [245, 'blue'], [278, 'violet'], [325, 'pink']];
+const SHADE_ROWS = [['pale', .8, .88], ['light', .82, .74], ['', .8, .6], ['deep', .7, .46], ['dark', .62, .32]];
+const cap = (t) => t[0].toUpperCase() + t.slice(1);
+const SHADES = [];
+for (const [word, s, l] of SHADE_ROWS) for (const [h, name] of HUES) { const [r, g, b] = hsl(h, s, l); SHADES.push({ c: (r << 16) | (g << 8) | b, name: cap(`${word} ${name}`.trim()) }); }
+const EARTH = [
+  ['#F3E2C7', 'sand'], ['#D9B98C', 'wheat'], ['#B98B5A', 'caramel'], ['#8C5E34', 'brown'], ['#5E3B1E', 'chocolate'], ['#3B2412', 'espresso'],
+  ['#FDE7D6', 'skin tone 1'], ['#F6CDA9', 'skin tone 2'], ['#E2A985', 'skin tone 3'], ['#C4865E', 'skin tone 4'], ['#97603D', 'skin tone 5'], ['#5F3A24', 'skin tone 6'],
+  ['#F0F0F2', 'mist'], ['#D4D4D8', 'pale grey'], ['#B4B4BA', 'light grey'], ['#8E8E96', 'grey'], ['#696970', 'slate'], ['#46464C', 'charcoal'],
+  ['#2A2A2E', 'soot'], ['#111114', 'black'], ['#D8B24A', 'gold'], ['#BFC3C8', 'silver'], ['#B87333', 'copper'], ['#9EE6CF', 'mint'],
+].map(([hex, name]) => ({ c: hexToInt(hex), name: cap(name) }));
+
+// Per-tablet conveniences (big box on/off, recent colours).
+const prefs = {
+  get(k, d) { try { const v = localStorage.getItem('snap-splash-' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('snap-splash-' + k, JSON.stringify(v)); } catch (e) {} },
+};
+let bigBox = prefs.get('bigbox', false) === true;
+let recent = (Array.isArray(prefs.get('recent', [])) ? prefs.get('recent', []) : []).filter((n) => Number.isInteger(n) && n >= 0 && n < 0x1000000).slice(0, 5);
 
 // ---------------------------------------------------------------- small helpers
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -1050,12 +1149,12 @@ function grainFor(w, h) {
 }
 function paintIdx(i, code) {
   const o = i << 2, d = S.fillData;
-  if (code < 0) { d[o] = 255; d[o + 1] = 255; d[o + 2] = 255; return; }
+  if (code === NONE) { d[o] = 255; d[o + 1] = 255; d[o + 2] = 255; return; }
   let r, g, b;
   if (code === RAINBOW) {
     const x = i % S.W, y = (i - x) / S.W, h = (((x * .8 + y) / S.rainbowPeriod * 360) % 360) | 0;
     r = RB[h * 3]; g = RB[h * 3 + 1]; b = RB[h * 3 + 2];
-  } else { r = PAL[code * 3]; g = PAL[code * 3 + 1]; b = PAL[code * 3 + 2]; }
+  } else { r = code >> 16 & 255; g = code >> 8 & 255; b = code & 255; }
   const a = S.grain[i];
   d[o] = r + (((255 - r) * a) >> 8); d[o + 1] = g + (((255 - g) * a) >> 8); d[o + 2] = b + (((255 - b) * a) >> 8);
 }
@@ -1119,8 +1218,12 @@ function startFill(L, code, tx, ty) {
 function setupPlay(page) {
   S.page = page; S.W = page.w; S.H = page.h;
   S.reg = buildRegions(page.barrier, page.w, page.h);
-  S.colours = new Int8Array(S.reg.m).fill(-1);
-  if (page.colours && page.colours.length === S.reg.m) S.colours.set(page.colours);
+  S.colours = new Int32Array(S.reg.m).fill(NONE);
+  if (page.colours && page.colours.length === S.reg.m) {
+    if (page.v === 2) S.colours.set(page.colours);
+    // pages saved by the first version stored crayon numbers 0-11, 12 = rainbow
+    else page.colours.forEach((c, i) => { S.colours[i] = c >= 0 && c < 12 ? BASIC[c] : c === 12 ? RAINBOW : NONE; });
+  }
   S.grain = grainFor(S.W, S.H);
   S.rainbowPeriod = Math.max(S.W, S.H) * .45;
   S.undo = []; S.anims.clear(); S.dirty = null; S.changed = page.kind === 'photo' && !page.saved;
@@ -1138,15 +1241,41 @@ function setupPlay(page) {
   fitPaper();
   updateUndo();
 }
+// ---- zoom: the sheet has a fitted size (bw x bh at bx,by) and is moved / scaled by a transform
+const V = { z: 1, x: 0, y: 0, bx: 0, by: 0, bw: 0, bh: 0, gt: 0 }, ZMAX = 6;
 function fitPaper() {
   if (!S.page || $('play').hidden) return;
-  const st = $('stage'), cs = getComputedStyle(st);
-  const bw = st.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 6;
-  const bh = st.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 14;
-  const s = Math.max(.05, Math.min(bw / S.W, bh / S.H));
-  $('paper').style.width = Math.floor(S.W * s) + 'px';
-  $('paper').style.height = Math.floor(S.H * s) + 'px';
+  const st = $('stage'), sw = st.clientWidth, sh = st.clientHeight, side = 16, top = 8, bottom = 14;
+  const s = Math.max(.05, Math.min((sw - 2 * side - 6) / S.W, (sh - top - bottom - 6) / S.H));
+  V.bw = Math.floor(S.W * s); V.bh = Math.floor(S.H * s);
+  V.bx = (sw - V.bw - 6) / 2; V.by = top + (sh - top - bottom - V.bh - 6) / 2;
+  const p = $('paper');
+  p.style.width = V.bw + 'px'; p.style.height = V.bh + 'px'; p.style.left = V.bx + 'px'; p.style.top = V.by + 'px';
+  V.z = 1; V.x = 0; V.y = 0; applyView();
 }
+function applyView() {
+  const st = $('stage'), sw = st.clientWidth, sh = st.clientHeight;
+  if (V.z <= 1.001) { V.z = 1; V.x = 0; V.y = 0; }
+  else {
+    // keep the sheet over the window: centred if it fits, otherwise no further than 24px past an edge
+    const w = (V.bw + 6) * V.z, h = (V.bh + 6) * V.z, pad = 24;
+    const L = w <= sw ? (sw - w) / 2 : clamp(V.bx + V.x, sw - w - pad, pad);
+    const T = h <= sh ? (sh - h) / 2 : clamp(V.by + V.y, sh - h - pad, pad);
+    V.x = L - V.bx; V.y = T - V.by;
+  }
+  $('paper').style.transform = `translate(${V.x}px, ${V.y}px) scale(${V.z})`;
+  $('zoomOut').style.opacity = V.z > 1 ? 1 : .45;
+}
+function zoomAt(fx, fy, nz, glide) {
+  nz = clamp(nz, 1, ZMAX);
+  const k = nz / V.z, L = V.bx + V.x, T = V.by + V.y;
+  V.x = fx - (fx - L) * k - V.bx; V.y = fy - (fy - T) * k - V.by; V.z = nz;
+  const p = $('paper');
+  if (glide && !reduceMotion) { p.classList.add('glide'); clearTimeout(V.gt); V.gt = setTimeout(() => p.classList.remove('glide'), 260); }
+  applyView();
+}
+$('zoomIn').addEventListener('click', () => { const st = $('stage'); zoomAt(st.clientWidth / 2, st.clientHeight / 2, V.z * 1.75, true); });
+$('zoomOut').addEventListener('click', () => { const st = $('stage'), nz = V.z / 1.75; zoomAt(st.clientWidth / 2, st.clientHeight / 2, nz < 1.15 ? 1 : nz, true); });
 function updateUndo() { $('undoBtn').style.opacity = S.undo.length ? 1 : .45; }
 
 function splashFx(px, py, code) {
@@ -1154,29 +1283,83 @@ function splashFx(px, py, code) {
   const fx = $('fx');
   for (let k = 0; k < 9; k++) {
     const d = document.createElement('i'), a = (k / 9) * Math.PI * 2 + Math.random() * .5, r = 38 + Math.random() * 34;
-    const col = code === ERASER ? '#FFFFFF' : code === RAINBOW ? CRAYONS[(k * 5) % 12].hex : CRAYONS[code].hex;
+    const col = code === ERASER ? '#FFFFFF' : code === RAINBOW ? CRAYONS[(k * 5) % 12].hex : intToHex(code);
     d.className = 'drop';
     d.style.cssText = `left:${px}px;top:${py}px;--c:${col};--dx:${Math.cos(a) * r}px;--dy:${Math.sin(a) * r}px`;
     fx.appendChild(d);
     setTimeout(() => d.remove(), 650);
   }
 }
-$('paper').addEventListener('pointerdown', (ev) => {
+function fillAt(clientX, clientY) {
   if (!S.reg) return;
-  ev.preventDefault();
-  const r = $('fillCanvas').getBoundingClientRect();
-  const x = Math.floor((ev.clientX - r.left) / r.width * S.W), y = Math.floor((ev.clientY - r.top) / r.height * S.H);
+  const r = $('fillCanvas').getBoundingClientRect();   // already includes the zoom transform
+  const x = Math.floor((clientX - r.left) / r.width * S.W), y = Math.floor((clientY - r.top) / r.height * S.H);
   if (x < 0 || y < 0 || x >= S.W || y >= S.H) return;
   const L = S.reg.lab[y * S.W + x], code = S.tool;
   if (startFill(L, code, x, y)) {
-    if (code === ERASER) Sound.erase(); else if (code === RAINBOW) Sound.rainbow(); else Sound.fill(code);
-    splashFx(ev.clientX - r.left, ev.clientY - r.top, code);
+    if (code === ERASER) Sound.erase(); else if (code === RAINBOW) Sound.rainbow(); else Sound.fill(noteFor(code));
+    splashFx((clientX - r.left) * V.bw / r.width, (clientY - r.top) * V.bh / r.height, code);
     S.changed = true; scheduleSave(); updateUndo();
   } else {
     Sound.same();
     const p = $('paper'); p.classList.remove('nope'); void p.offsetWidth; p.classList.add('nope');
   }
-});
+}
+// One finger: a tap fills (on lift), a drag moves the page when zoomed in.
+// Two fingers: pinch to zoom and move. Mouse wheel / trackpad pinch zoom at the pointer.
+(() => {
+  const st = $('stage'), ptrs = new Map();
+  let tap = null, pinch = null;
+  const local = (e) => { const r = st.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  function startPinch() {
+    const [a, b] = [...ptrs.values()];
+    pinch = { d0: Math.max(12, Math.hypot(a.x - b.x, a.y - b.y)), mx0: (a.x + b.x) / 2, my0: (a.y + b.y) / 2, z0: V.z, L0: V.bx + V.x, T0: V.by + V.y };
+  }
+  st.addEventListener('pointerdown', (e) => {
+    if (!S.reg || e.target.closest('.zoom')) return;
+    e.preventDefault();
+    try { st.setPointerCapture(e.pointerId); } catch (err) {}
+    const [x, y] = local(e);
+    ptrs.set(e.pointerId, { x, y });
+    if (ptrs.size === 1) tap = { id: e.pointerId, x0: x, y0: y, cx: e.clientX, cy: e.clientY, px: V.x, py: V.y, mode: 'tap' };
+    else { if (tap) tap.mode = 'none'; startPinch(); }
+  });
+  st.addEventListener('pointermove', (e) => {
+    const p = ptrs.get(e.pointerId); if (!p) return;
+    [p.x, p.y] = local(e);
+    if (ptrs.size >= 2 && pinch) {
+      const [a, b] = [...ptrs.values()];
+      const nz = clamp(pinch.z0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d0, 1, ZMAX), k = nz / pinch.z0;
+      V.z = nz;
+      V.x = (a.x + b.x) / 2 - (pinch.mx0 - pinch.L0) * k - V.bx;
+      V.y = (a.y + b.y) / 2 - (pinch.my0 - pinch.T0) * k - V.by;
+      applyView();
+    } else if (tap && tap.id === e.pointerId) {
+      const dx = p.x - tap.x0, dy = p.y - tap.y0;
+      // small wobbles still count as a tap; little fingers are rarely still
+      if (tap.mode === 'tap' && Math.hypot(dx, dy) > (V.z > 1 ? 12 : 40)) tap.mode = V.z > 1 ? 'pan' : 'none';
+      if (tap.mode === 'pan') { V.x = tap.px + dx; V.y = tap.py + dy; applyView(); }
+    }
+  });
+  function end(e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    if (e.type === 'pointerup' && tap && tap.id === e.pointerId && tap.mode === 'tap') fillAt(tap.cx, tap.cy);
+    if (ptrs.size < 2) pinch = null;
+    if (ptrs.size === 1) {   // the finger still down after a pinch carries on moving the page
+      const [id, p] = [...ptrs.entries()][0];
+      tap = { id, x0: p.x, y0: p.y, px: V.x, py: V.y, mode: V.z > 1 ? 'pan' : 'none' };
+    } else if (!ptrs.size) tap = null;
+  }
+  st.addEventListener('pointerup', end);
+  st.addEventListener('pointercancel', end);
+  st.addEventListener('wheel', (e) => {
+    if (!S.reg) return;
+    e.preventDefault();
+    const [x, y] = local(e);
+    zoomAt(x, y, V.z * Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0016)));
+  }, { passive: false });
+})();
 $('undoBtn').addEventListener('click', () => {
   const u = S.undo.pop(); if (!u) return;
   const [L, prev] = u;
@@ -1184,19 +1367,58 @@ $('undoBtn').addEventListener('click', () => {
   Sound.undo(); S.changed = true; scheduleSave(); updateUndo();
 });
 
-// Crayon box
-const TOOLS = [...CRAYONS.map((c, i) => ({ code: i, name: c.name, fill: c.hex })), { code: RAINBOW, name: 'Rainbow', fill: 'url(#rainbowFill)' }, { code: ERASER, name: 'Eraser' }];
-$('tray').innerHTML = TOOLS.map((t) => t.code === ERASER
-  ? `<button class="crayon" type="button" role="radio" aria-checked="false" aria-label="${t.name}" data-code="${t.code}"><svg viewBox="0 0 54 124" aria-hidden="true"><rect class="e-rub" x="8" y="10" width="38" height="46" rx="9"/><rect class="e-sleeve" x="5" y="46" width="44" height="84" rx="5"/><path class="e-stripe" d="M5 66H49M5 80H49"/></svg></button>`
-  : `<button class="crayon" type="button" role="radio" aria-checked="false" aria-label="${t.name}" data-code="${t.code}" style="--c:${t.fill}"><svg viewBox="0 0 54 124" aria-hidden="true"><path class="c-tip" d="M20 7Q27 1 34 7L45 37H9Z"/><rect class="c-body" x="7" y="35" width="40" height="95" rx="6"/><rect class="c-band" x="7" y="48" width="40" height="9"/><rect class="c-band" x="7" y="104" width="40" height="9"/><path class="c-shine" d="M16 64V96"/></svg></button>`
-).join('');
+// Crayon box: 12 crayons, rainbow and eraser; with the big box on, also a box button and recent colours.
+const crayonBtn = (code, name, fill) => `<button class="crayon" type="button" role="radio" aria-checked="false" aria-label="${name}" data-code="${code}" style="--c:${fill}"><svg viewBox="0 0 54 124" aria-hidden="true"><path class="c-tip" d="M20 7Q27 1 34 7L45 37H9Z"/><rect class="c-body" x="7" y="35" width="40" height="95" rx="6"/><rect class="c-band" x="7" y="48" width="40" height="9"/><rect class="c-band" x="7" y="104" width="40" height="9"/><path class="c-shine" d="M16 64V96"/></svg></button>`;
+const eraserBtn = `<button class="crayon" type="button" role="radio" aria-checked="false" aria-label="Eraser" data-code="${ERASER}"><svg viewBox="0 0 54 124" aria-hidden="true"><rect class="e-rub" x="8" y="10" width="38" height="46" rx="9"/><rect class="e-sleeve" x="5" y="46" width="44" height="84" rx="5"/><path class="e-stripe" d="M5 66H49M5 80H49"/></svg></button>`;
+const boxBtn = `<button class="crayon boxbtn" type="button" data-action="box" aria-label="Big crayon box: more colours" aria-haspopup="dialog"><svg viewBox="0 0 54 124" aria-hidden="true"><path class="bb-tip" style="fill:#E5412F" d="M7 24 10 10Q12 6 14 10L17 24Z"/><path class="bb-tip" style="fill:#5DC4EE" d="M22 24 25 7Q27 3 29 7L32 24Z"/><path class="bb-tip" style="fill:#8CCB3F" d="M37 24 40 10Q42 6 44 10L47 24Z"/><rect class="bb-box" x="3" y="20" width="48" height="110" rx="6"/><path class="bb-plus" d="M27 34V54M17 44H37"/></svg></button>`;
+let nameOf = new Map();
+function renderTray() {
+  const parts = [];
+  if (bigBox) { parts.push(boxBtn); recent.forEach((c) => parts.push(crayonBtn(c, nameOf.get(c) || 'Your colour', intToHex(c)))); }
+  CRAYONS.forEach((c, i) => parts.push(crayonBtn(BASIC[i], c.name, c.hex)));
+  parts.push(crayonBtn(RAINBOW, 'Rainbow', 'url(#rainbowFill)'), eraserBtn);
+  $('tray').innerHTML = parts.join('');
+  $('lip').textContent = bigBox ? 'Big crayon box' : '12 colours · 1 rainbow';
+  markTool();
+}
+function markTool() { for (const b of $('tray').querySelectorAll('[role="radio"]')) b.setAttribute('aria-checked', String(+b.dataset.code === S.tool)); }
 function selectTool(code, quiet) {
   S.tool = code;
-  for (const b of $('tray').children) b.setAttribute('aria-checked', String(+b.dataset.code === code));
-  if (!quiet) { if (code === ERASER) Sound.erase(); else Sound.pick(code === RAINBOW ? 7 : code); }
+  if (code >= 0 && !BASIC.includes(code) && !recent.includes(code)) {
+    recent = [code, ...recent].slice(0, 5); prefs.set('recent', recent); renderTray();
+  } else markTool();
+  if (quiet) return;
+  const b = $('tray').querySelector(`[data-code="${code}"]`);
+  if (b) b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+  if (code === ERASER) Sound.erase(); else Sound.pick(noteFor(code));
 }
-$('tray').addEventListener('click', (e) => { const b = e.target.closest('.crayon'); if (b) selectTool(+b.dataset.code); });
-selectTool(5, true);
+$('tray').addEventListener('click', (e) => {
+  const b = e.target.closest('.crayon'); if (!b) return;
+  if (b.dataset.action === 'box') openPalette(); else selectTool(+b.dataset.code);
+});
+
+// The big crayon box sheet
+const swatch = ({ c, name }) => `<button class="sw" type="button" data-code="${c}" style="--c:${intToHex(c)}" aria-label="${name}" aria-pressed="false"></button>`;
+[...SHADES, ...EARTH].forEach(({ c, name }) => nameOf.set(c, name));
+$('palShades').innerHTML = SHADES.map(swatch).join('');
+$('palEarth').innerHTML = EARTH.map(swatch).join('');
+function openPalette() {
+  $('palRecent').innerHTML = recent.map((c) => swatch({ c, name: nameOf.get(c) || 'Your colour' })).join('');
+  $('palRecentWrap').hidden = !recent.length;
+  for (const b of $('palette').querySelectorAll('.sw')) b.setAttribute('aria-pressed', String(+b.dataset.code === S.tool));
+  $('palette').hidden = false;
+}
+function closePalette() { $('palette').hidden = true; }
+$('paletteClose').addEventListener('click', closePalette);
+$('palette').addEventListener('click', (e) => {
+  if (e.target === $('palette')) { closePalette(); return; }
+  const sw = e.target.closest('.sw');
+  if (sw) { selectTool(+sw.dataset.code); closePalette(); }
+});
+$('mixInput').addEventListener('input', (e) => { $('mixDot').style.background = e.target.value; });
+$('mixInput').addEventListener('change', (e) => { selectTool(hexToInt(e.target.value)); closePalette(); });
+S.tool = BASIC[5];
+renderTray();
 
 // Saving: every page lives on this tablet (IndexedDB), with a mask PNG + the colour of each area.
 function scheduleSave() { clearTimeout(S.saveTimer); S.saveTimer = setTimeout(saveNow, 1200); }
@@ -1223,8 +1445,8 @@ async function saveNow() {
   try {
     if (!p.maskBlob) p.maskBlob = await encodeMask(p);
     const thumb = await toBlob(composite(480), 'image/jpeg', .86);
-    p.colours = Array.from(S.colours); p.saved = true;
-    await DB.put({ id: p.id, kind: p.kind, sampleKey: p.sampleKey || null, w: p.w, h: p.h, mask: p.maskBlob, colours: p.colours, thumb, created: p.created || Date.now(), updated: Date.now() });
+    p.colours = Array.from(S.colours); p.v = 2; p.saved = true;
+    await DB.put({ id: p.id, kind: p.kind, sampleKey: p.sampleKey || null, w: p.w, h: p.h, mask: p.maskBlob, colours: p.colours, v: 2, thumb, created: p.created || Date.now(), updated: Date.now() });
   } catch (e) { console.warn('save failed', e); }
 }
 async function decodePage(rec) {
@@ -1236,7 +1458,7 @@ async function decodePage(rec) {
   const d = x.getImageData(0, 0, rec.w, rec.h).data, n = rec.w * rec.h;
   const lineAlpha = new Uint8Array(n), barrier = new Uint8Array(n);
   for (let i = 0; i < n; i++) { lineAlpha[i] = d[i * 4]; barrier[i] = d[i * 4 + 1] > 127 ? 1 : 0; }
-  return { id: rec.id, kind: rec.kind, sampleKey: rec.sampleKey, w: rec.w, h: rec.h, lineAlpha, barrier, colours: rec.colours, maskBlob: rec.mask, created: rec.created, saved: true };
+  return { id: rec.id, kind: rec.kind, sampleKey: rec.sampleKey, w: rec.w, h: rec.h, lineAlpha, barrier, colours: rec.colours, v: rec.v || 1, maskBlob: rec.mask, created: rec.created, saved: true };
 }
 
 $('homeBtn').addEventListener('click', async () => {
@@ -1350,7 +1572,13 @@ async function openItem(it) {
   btn.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') stop(); });
   btn.addEventListener('contextmenu', (e) => e.preventDefault());
 })();
-function openParent() { syncSoundBtn(); $('parent').hidden = false; $('cameraInput').focus(); }
+function openParent() { syncSoundBtn(); syncBigBoxBtn(); $('parent').hidden = false; $('cameraInput').focus(); }
+function syncBigBoxBtn() { const b = $('bigBoxBtn'); b.textContent = bigBox ? 'Big crayon box: on' : 'Big crayon box: off'; b.setAttribute('aria-pressed', String(bigBox)); }
+$('bigBoxBtn').addEventListener('click', () => {
+  bigBox = !bigBox; prefs.set('bigbox', bigBox);
+  if (!bigBox && S.tool >= 0 && !BASIC.includes(S.tool)) S.tool = BASIC[5];
+  renderTray(); syncBigBoxBtn();
+});
 function closeParent() { $('parent').hidden = true; }
 function syncSoundBtn() { const b = $('soundBtn'); b.textContent = Sound.on ? 'Sound: on' : 'Sound: off'; b.setAttribute('aria-pressed', String(Sound.on)); }
 $('parentClose').addEventListener('click', closeParent);

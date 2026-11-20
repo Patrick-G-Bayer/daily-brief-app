@@ -11,6 +11,8 @@ It's a single file, `index.html`. Open it in a tablet browser, or serve the fold
 3. **Line up the page (grown-up).** Drag four corner dots onto the picture. This also straightens a photo taken at an angle.
 4. **Check the outlines (grown-up).** Preview of the outlines, with each tap area tinted. A *Fewer lines / More lines* slider fixes leaks or missing lines.
 5. **Colour (child).** 12 crayons, a rainbow crayon and an eraser. Each tap fills the whole area with a splash that spreads from the finger, plus droplets and a note. Undo, star (confetti), save to tablet.
+6. **Zoom.** Pinch with two fingers to zoom (up to 6×) and drag to move around, or use the + / − buttons and the mouse wheel. A tap still fills; a drag never does.
+7. **Big crayon box (grown-ups' option).** Switched on in the grown-ups box. It adds a crayon box to the tray that opens 60 shades (12 hues × 5 depths), earth, skin, grey and metallic colours, and a "mix your own" colour picker. Colours you pick join the tray as crayons (last 5).
 
 Progress saves automatically on the tablet in IndexedDB. Pictures never leave the device.
 
@@ -36,4 +38,5 @@ All of this is plain JS on a canvas, about 1 second on a 1200 px picture:
 
 - Faint or thin lines (glare, plastic wrap, a page far from the camera) can break up and merge areas. Filling the frame with the page works best, and *More lines* helps.
 - No automatic page-corner detection yet; corners start at the photo edges.
-- Ideas: pinch-zoom for small areas, sticker stamps, a "magic brush" free-draw mode, voice prompts for colour names.
+- Zoom scales the 1200 px working picture, so lines soften past about 3×.
+- Ideas: sticker stamps, a "magic brush" free-draw mode, voice prompts for colour names.
